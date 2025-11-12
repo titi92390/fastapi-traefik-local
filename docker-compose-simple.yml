@@ -1,0 +1,7 @@
+services:
+  fastapi:
+    build: ./app
+    container_name: fastapi_simple
+    ports:
+      - "8000:8000"
+
