@@ -1,0 +1,31 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"      # Port d'entrée HTTP
+      - "8080:8080"  # Dashboard Traefik (interface)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - web
+
+  fastapi:
+    build: ./app
+    container_name: fastapi_app
+    ports:
+      - "8000:8000" 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.fastapi.entrypoints=web"
+      - "traefik.http.services.fastapi.loadbalancer.server.port=8000"
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
